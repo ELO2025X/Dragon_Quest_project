@@ -1,7 +1,218 @@
+import json
+import os
 import random
 import numpy as np
 from settings import *
 import pygame
+
+class Segment:
+    def __init__(self, data):
+        self.id = data['id']
+        self.type = data['type']
+        self.width = data['width']
+        self.height = data['height']
+        self.grid_raw = data['grid'] # List of strings
+        self.exits = data['exits'] # List of dicts
+        
+        # Convert grid to numpy
+        self.layout = np.zeros((self.height, self.width), dtype=np.int8)
+        self.collision = np.ones((self.height, self.width), dtype=np.int8)
+        
+        for r, row in enumerate(self.grid_raw):
+            for c, char in enumerate(row):
+                if char == '#':
+                    self.layout[r][c] = 5 # WALL
+                    self.collision[r][c] = 1
+                else:
+                    self.layout[r][c] = 6 # FLOOR
+                    self.collision[r][c] = 0
+                    
+    def rotate(self, rotations=1):
+        """Rotate the segment 90 degrees clockwise N times"""
+        for _ in range(rotations):
+            self.layout = np.rot90(self.layout, k=-1)
+            self.collision = np.rot90(self.collision, k=-1)
+            self.width, self.height = self.height, self.width
+            
+            # Rotate exits
+            new_exits = []
+            for ex in self.exits:
+                nx, ny = self.width - 1 - ex['y'], ex['x']
+                
+                # Rotate direction
+                dirs = ["NORTH", "EAST", "SOUTH", "WEST"]
+                try:
+                   idx = dirs.index(ex['direction'])
+                   new_dir = dirs[(idx + 1) % 4]
+                except:
+                   new_dir = ex['direction']
+                   
+                new_exits.append({"x": nx, "y": ny, "direction": new_dir})
+            self.exits = new_exits
+
+class SegmentGenerator:
+    def __init__(self, seed=None):
+        self.seed = seed if seed else random.randint(0, 10000)
+        random.seed(self.seed)
+        self.WALL = 5
+        self.FLOOR = 6
+        self.segments = self.load_segments()
+        
+    def load_segments(self):
+        path = os.path.join(os.path.dirname(__file__), 'data', 'segments.json')
+        try:
+            with open(path, 'r') as f:
+                data = json.load(f)
+            return [Segment(s) for s in data['segments']]
+        except FileNotFoundError:
+            print(f"Warning: Segments file not found at {path}")
+            return []
+
+    def generate_dungeon(self, width=60, height=60, max_segments=15):
+        # Initialize map
+        ground = np.full((height, width), self.WALL, dtype=np.int8)
+        collision = np.ones((height, width), dtype=np.int8)
+        decoration = np.zeros((height, width), dtype=np.int8)
+        
+        placed_segments = []
+        open_exits = [] # List of tuples: (map_x, map_y, direction, required_entry_dir)
+        
+        # 1. Place Start Segment (e.g., a room)
+        start_seg = self.get_segment_by_type("room")
+        if not start_seg: return None
+        
+        start_x = width // 2 - start_seg.width // 2
+        start_y = height // 2 - start_seg.height // 2
+        
+        self.place_segment(ground, collision, start_seg, start_x, start_y)
+        placed_segments.append(start_seg)
+        
+        # Add exits to open list
+        for ex in start_seg.exits:
+             open_exits.append((start_x + ex['x'], start_y + ex['y'], ex['direction']))
+             
+        # 2. Iteratively place segments
+        failures = 0
+        while len(placed_segments) < max_segments and open_exits and failures < 50:
+            # Pick a random exit
+            exit_idx = random.randint(0, len(open_exits) - 1)
+            ex_x, ex_y, ex_dir = open_exits[exit_idx]
+            
+            # Determine required opposite direction
+            opposites = {"NORTH": "SOUTH", "SOUTH": "NORTH", "EAST": "WEST", "WEST": "EAST"}
+            req_entry = opposites.get(ex_dir)
+            
+            # Pick a random segment (maybe prioritize corridors if just left a room)
+            candidate = random.choice(self.segments)
+            
+            # Try to align a matching exit
+            # We need to find an exit on the candidate that points in 'req_entry' direction
+            # If not found, try rotating
+            success = False
+            best_rotation = 0
+            matching_exit = None
+            
+            # HACK: Create a deep copy or re-instantiate because we are mutating via rotate in loop
+            # For simplicity, let's just rotate the one we have and rotate back if fail? 
+            # Better: re-instantiate from raw list or clone.
+            # Lazy approach: Try 4 rotations
+            import copy
+            test_seg = copy.deepcopy(candidate)
+            
+            for r in range(4):
+                for seg_ex in test_seg.exits:
+                     if seg_ex['direction'] == req_entry:
+                         # Found a potential connection
+                         # Calculate placement top-left
+                         # If exit is at (sx, sy), and map exit is (mx, my)
+                         # Then map_top_left = mx - sx, my - sy
+                         
+                         tx = ex_x - seg_ex['x']
+                         ty = ex_y - seg_ex['y']
+                         
+                         if self.can_place(ground, test_seg, tx, ty):
+                             self.place_segment(ground, collision, test_seg, tx, ty)
+                             placed_segments.append(test_seg)
+                             
+                             # Add new exits
+                             del open_exits[exit_idx] # Remove used exit defined on map
+                             
+                             for new_ex in test_seg.exits:
+                                 # Don't add the one we just connected to
+                                 if new_ex is not seg_ex:
+                                     open_exits.append((tx + new_ex['x'], ty + new_ex['y'], new_ex['direction']))
+                                     
+                             success = True
+                             break
+                if success: break
+                test_seg.rotate()
+                
+            if not success:
+               failures += 1
+        
+        # 3. Cap remaining exits (TODO: Add simple walls)
+        
+        # Return format matching WorldGenerator expectation
+        entities = []
+        # Calculate rough spawn
+        spawn_x = width // 2
+        spawn_y = height // 2
+        
+        return {
+            "id": "segment_dungeon",
+            "width": width,
+            "height": height,
+            "layers": {
+                "ground": ground,
+                "decoration": decoration,
+                "collision": collision
+            },
+            "entities": entities,
+            "spawn": (spawn_x, spawn_y),
+            "exits": []
+        }
+
+    def get_segment_by_type(self, type_name):
+        opts = [s for s in self.segments if s.type == type_name]
+        return random.choice(opts) if opts else (self.segments[0] if self.segments else None)
+
+    def can_place(self, ground, segment, x, y):
+        # Check bounds
+        if x < 1 or y < 1 or x + segment.width >= ground.shape[1] - 1 or y + segment.height >= ground.shape[0] - 1:
+            return False
+            
+        # Check collision with existing floor (simplified overlap check)
+        # Only check where the new segment has floor? Or strict box check?
+        # Strict box check is safer for now.
+        region = ground[y:y+segment.height, x:x+segment.width]
+        # If any part of the region is already floor (our FLOOR ID is 6), fail.
+        # But we need to allow the connection point overlapping?
+        # Ideally, we allow overlap of 1 tile at the connection, but checking that is complex.
+        # Instead, let's just check if the box overlaps significantly.
+        
+        # Count non-WALL tiles in region
+        overlap = np.count_nonzero(region == self.FLOOR)
+        if overlap > 0:
+             # If it overlaps, it might be just the connection. 
+             # For a robust generator, we'd use a mask. 
+             # For this MVP, let's be strict: NO significant overlap. 
+             # (This might make it hard to connect)
+             return False 
+             
+        return True
+
+    def place_segment(self, ground, collision, segment, x, y):
+        for r in range(segment.height):
+            for c in range(segment.width):
+                # Don't overwrite existing floor with walls if we are merging? 
+                # Our segment is a box.
+                tile = segment.layout[r][c]
+                if tile != 5: # If it's not a generic wall, place it
+                    ground[y+r][x+c] = tile
+                    collision[y+r][x+c] = segment.collision[r][c]
+                elif ground[y+r][x+c] == 5: # Only overwrite wall with wall (if empty)
+                     ground[y+r][x+c] = tile
+
 
 class DungeonGenerator:
     def __init__(self, seed=None):
