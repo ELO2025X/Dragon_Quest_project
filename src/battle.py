@@ -4,6 +4,7 @@ import numpy as np
 import math
 from settings import *
 from components.combat import CombatComponent
+from dice import DicePool
 from spell import SpellDatabase
 from combat_item import ItemDatabase
 from combat_effects import FlashEffect, DamageNumber, ScreenShake
@@ -26,6 +27,63 @@ class BattleState:
 
     def draw(self, surface: pygame.Surface):
         self.battle.game.battle_ui.draw(self.battle)
+
+    def draw(self, surface: pygame.Surface):
+        self.battle.game.battle_ui.draw(self.battle)
+
+class TacticalPauseState(BattleState):
+    def __init__(self, battle):
+        super().__init__(battle)
+        if not hasattr(battle, 'dice_pool'):
+            battle.dice_pool = DicePool(3)
+        
+        battle.dice_pool.roll_all()
+        self.selected_die = 0
+        self.zones = ['attack', 'defense', 'agility', None] # None is 'Bench'
+        
+    def handle_input(self, event):
+        if event.type == pygame.KEYDOWN:
+            pool = self.battle.dice_pool
+            
+            # Navigate between dice
+            if event.key == pygame.K_LEFT or event.key == pygame.K_a:
+                self.selected_die = (self.selected_die - 1) % len(pool.dice)
+                if hasattr(self.battle.game, 'sound_manager'): self.battle.game.sound_manager.play("menu")
+                
+            elif event.key == pygame.K_RIGHT or event.key == pygame.K_d:
+                self.selected_die = (self.selected_die + 1) % len(pool.dice)
+                if hasattr(self.battle.game, 'sound_manager'): self.battle.game.sound_manager.play("menu")
+                
+            # Allocate Dice (Up/Down cycles zones?) 
+            # Or use specific keys? Let's use Up/Down to cycle through zones: None -> Attack -> Defense -> Speed -> None
+            elif event.key == pygame.K_UP or event.key == pygame.K_w:
+                self.cycle_allocation(self.selected_die, 1)
+                
+            elif event.key == pygame.K_DOWN or event.key == pygame.K_s:
+                self.cycle_allocation(self.selected_die, -1)
+                
+            elif event.key == pygame.K_RETURN or event.key == pygame.K_SPACE:
+                self.confirm_allocation()
+
+    def cycle_allocation(self, die_idx, direction):
+        pool = self.battle.dice_pool
+        current_zone = pool.allocations[die_idx]
+        
+        # Define order
+        order = [None, 'attack', 'defense', 'agility']
+        try:
+            idx = order.index(current_zone)
+        except ValueError:
+            idx = 0
+            
+        new_idx = (idx + direction) % len(order)
+        pool.allocate(die_idx, order[new_idx])
+        if hasattr(self.battle.game, 'sound_manager'): self.battle.game.sound_manager.play("menu")
+
+    def confirm_allocation(self):
+        # Apply Bonuses
+        self.battle.apply_dice_bonuses()
+        self.battle.change_state("main_menu")
 
 class MainMenuState(BattleState):
     def __init__(self, battle):
@@ -95,7 +153,11 @@ class PlayerAttackState(BattleState):
 
     def player_attack(self):
         target_enemy = self.battle.enemies[self.target_index]
-        attack_power = self.battle.player.combat.get_attribute("strength") * 2 + self.battle.player.level
+        
+        # Apply Dice Bonus
+        bonus_str = self.battle.current_bonuses.get('attack', 0)
+        attack_power = (self.battle.player.combat.get_attribute("strength") + bonus_str) * 2 + self.battle.player.level
+        
         defense_power = target_enemy.get_component(CombatComponent).get_attribute("defense") * 2
         
         base_damage = np.subtract(attack_power, defense_power)
@@ -576,7 +638,11 @@ class EnemyTurnState(BattleState):
             elif "wizard" in enemy.enemy_type or "mage" in enemy.enemy_type:
                 attack_type = "magic"
             
-            player_def = self.battle.player.combat.get_attribute("defense") * 2
+            
+            # Apply Dice Bonus to Player Defense
+            bonus_def = self.battle.current_bonuses.get('defense', 0)
+            player_def = (self.battle.player.combat.get_attribute("defense") + bonus_def) * 2
+            
             enemy_str = enemy.get_component(CombatComponent).get_attribute("strength") * 2
             enemy_int = enemy.get_component(CombatComponent).get_attribute("intelligence") * 2
             
@@ -646,7 +712,8 @@ class EnemyTurnState(BattleState):
                 return
 
         self.battle.message = full_message.strip()
-        self.battle.change_state("main_menu")
+        self.battle.message = full_message.strip()
+        self.battle.change_state("tactical_pause")
 
 class VictoryState(BattleState):
     def __init__(self, battle, **kwargs):
@@ -709,6 +776,7 @@ class Battle:
         self.rewards: Dict[str, Any] = {"xp": 0, "gold": 0}
         
         self.states: Dict[str, type] = {
+            "tactical_pause": TacticalPauseState,
             "main_menu": MainMenuState,
             "target_selection": TargetSelectionState,
             "player_attack": PlayerAttackState,
@@ -725,9 +793,24 @@ class Battle:
         self.active_effects: List[Any] = [] # List of active CombatEffects
         self.spell_db = SpellDatabase()
         self.item_db = ItemDatabase()
+        
+        # One Card Dungeon: Dice Pool
+        self.dice_pool = DicePool(3)
+        self.current_bonuses = {'attack': 0, 'defense': 0, 'agility': 0}
+        
         self.current_state: Optional[BattleState] = None
-        self.state = "main_menu" # Initialize state name
-        self.change_state("main_menu")
+        self.state = "tactical_pause" # Initialize state name
+        self.change_state("tactical_pause")
+
+    def apply_dice_bonuses(self):
+        self.current_bonuses['attack'] = self.dice_pool.get_total_bonus('attack')
+        self.current_bonuses['defense'] = self.dice_pool.get_total_bonus('defense')
+        self.current_bonuses['agility'] = self.dice_pool.get_total_bonus('agility')
+        self.message = "Dice allocated! Bonuses applied."
+
+        # Note: These bonuses need to be factored into damage calcs.
+        # We will need to update PlayerAttackState and EnemyTurnState (for player defense)
+
 
     def add_effect(self, effect):
         self.active_effects.append(effect)

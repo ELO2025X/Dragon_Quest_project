@@ -180,6 +180,8 @@ class BattleUI(UIElement):
              self.draw_magic_menu(surface, battle.current_state, ui_rect.x + 240, ui_rect.y + 30)
         elif battle.state == "item_menu":
              self.draw_item_menu(surface, battle.current_state, ui_rect.x + 240, ui_rect.y + 30)
+        elif battle.state == "tactical_pause":
+             self.draw_tactical_pause(surface, battle, ui_rect.x + 240, ui_rect.y + 30)
 
     def draw_text_with_shadow(self, surface, text, font, x, y, color=WHITE, shadow_color=(0, 0, 0)):
         shadow_surf = font.render(str(text), True, shadow_color)
@@ -187,6 +189,49 @@ class BattleUI(UIElement):
         surface.blit(shadow_surf, (x + 2, y + 2))
         surface.blit(text_surf, (x, y))
         return text_surf.get_width(), text_surf.get_height()
+
+    def draw_tactical_pause(self, surface, battle, x, y):
+        self.draw_text_with_shadow(surface, "Tactical Pause", self.font_large, x, y, (255, 215, 0))
+        self.draw_text_with_shadow(surface, "Allocated Dice Modifiers", self.font_small, x, y + 25, WHITE)
+        
+        pool = battle.dice_pool
+        state = battle.current_state
+        
+        # Draw Zones/Stats
+        zones = ["attack", "defense", "agility"]
+        zone_labels = {"attack": "ATK", "defense": "DEF", "agility": "SPD"}
+        
+        for i, zone in enumerate(zones):
+            bonus = pool.get_total_bonus(zone)
+            self.draw_text_with_shadow(surface, f"{zone_labels[zone]}: +{bonus}", self.font_battle, x, y + 50 + i * 25, WHITE)
+
+        # Draw Dice
+        dice_y = y + 140
+        for i, die in enumerate(pool.dice):
+            die_x = x + i * 60
+            
+            # Highlight selected die
+            if i == state.selected_die:
+                pygame.draw.rect(surface, (255, 255, 0), (die_x - 2, dice_y - 2, 44, 44), 2)
+            
+            # Die Body
+            pygame.draw.rect(surface, WHITE, (die_x, dice_y, 40, 40))
+            pygame.draw.rect(surface, BLACK, (die_x, dice_y, 40, 40), 2)
+            
+            # Value
+            val_text = self.font_large.render(str(die.value), True, BLACK)
+            surface.blit(val_text, (die_x + 12, dice_y + 10))
+            
+            # Allocation Indicator
+            alloc = pool.allocations[i]
+            if alloc:
+                label = zone_labels[alloc]
+                self.draw_text_with_shadow(surface, label, self.font_small, die_x + 5, dice_y - 20, (100, 255, 100))
+            else:
+                self.draw_text_with_shadow(surface, "--", self.font_small, die_x + 10, dice_y - 20, (150, 150, 150))
+                
+        # Instructions
+        self.draw_text_with_shadow(surface, "Arrows: Move/Assign  Enter: Confirm", self.font_small, x - 20, dice_y + 50, (200, 200, 200))
 
     def draw_battle_menu(self, surface, state, x, y):
         for i, option in enumerate(state.options):

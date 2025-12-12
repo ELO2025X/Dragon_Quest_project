@@ -244,13 +244,14 @@ class Game:
         for sw in switches:
             sw.doors = doors
 
-    def run(self):
+    async def run(self):
         self.playing = True
         while self.playing:
             self.dt = self.clock.tick(FPS) / 1000
             self.events()
             self.update()
             self.draw()
+            await asyncio.sleep(0)
 
     def quit(self):
         pygame.quit()
@@ -326,5 +327,6 @@ class Game:
         pygame.draw.rect(self.screen, DEBUG_COLOR, self.camera.apply(self.player), 1)
 
 if __name__ == "__main__":
+    import asyncio
     game_instance = Game() # Assign to global
-    game_instance.run()
+    asyncio.run(game_instance.run())
