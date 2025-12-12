@@ -1,0 +1,78 @@
+{
+    "potion": {
+        "name": "Potion",
+        "type": "healing",
+        "power": 30,
+        "description": "Restores 30 HP."
+    },
+    "ether": {
+        "name": "Ether",
+        "type": "restore_mp",
+        "power": 15,
+        "description": "Restores 15 MP."
+    },
+    "bomb": {
+        "name": "Bomb",
+        "type": "damage",
+        "power": 40,
+        "element": "fire",
+        "description": "Deals 40 fire damage to an enemy."
+    },
+    "daryls_lucky_cap": {
+        "name": "Daryl's Lucky Cap",
+        "type": "accessory",
+        "stats": {
+            "luck": 10,
+            "defense": 5,
+            "crit_chance": 0.10,
+            "evasion": -0.05
+        },
+        "description": "A well-worn mesh-back cap. +10% Crit, -5% Evasion. 5% chance to convert damage to healing."
+    },
+    "infinite_six_pack": {
+        "name": "Infinite Six-Pack",
+        "type": "consumable",
+        "power": 0,
+        "effect": "random_six_pack",
+        "description": "A bottomless case of Bud Light. Toss to Heal (25%), Self-Dmg (25%), or Freeze (50%)."
+    },
+    "chicken_georges_shiny_key": {
+        "name": "Chicken George's Shiny Key",
+        "type": "key_item",
+        "description": "Unlocks a secret, bizarrely modern-looking shed."
+    },
+    "iron_sword": {
+        "name": "Iron Sword",
+        "type": "weapon",
+        "stats": {
+            "strength": 3
+        },
+        "description": "A standard iron sword."
+    },
+    "iron_axe": {
+        "name": "Iron Axe",
+        "type": "weapon",
+        "stats": {
+            "strength": 5,
+            "agility": -1
+        },
+        "description": "Heavy but powerful."
+    },
+    "wood_bow": {
+        "name": "Wood Bow",
+        "type": "weapon",
+        "stats": {
+            "agility": 2,
+            "strength": 1
+        },
+        "description": "A simple wooden bow."
+    },
+    "magic_staff": {
+        "name": "Magic Staff",
+        "type": "weapon",
+        "stats": {
+            "intelligence": 4
+        },
+        "description": "Imbued with potential."
+    }
+}

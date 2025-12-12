@@ -1,0 +1,45 @@
+{
+    "heal": {
+        "name": "Heal",
+        "cost": 5,
+        "power": 20,
+        "type": "healing",
+        "element": "holy",
+        "description": "Restores a small amount of HP."
+    },
+    "fireball": {
+        "name": "Fireball",
+        "cost": 8,
+        "power": 15,
+        "type": "damage",
+        "element": "fire",
+        "description": "Deals fire damage to a single enemy."
+    },
+    "icebolt": {
+        "name": "Icebolt",
+        "cost": 8,
+        "power": 15,
+        "type": "damage",
+        "element": "ice",
+        "description": "Deals ice damage to a single enemy."
+    },
+    "sleep": {
+        "name": "Sleep",
+        "cost": 10,
+        "power": 0,
+        "type": "status",
+        "effect": "sleep",
+        "duration": 3,
+        "chance": 0.7,
+        "description": "Puts an enemy to sleep."
+    },
+    "double_slash": {
+        "name": "Double Slash",
+        "cost": 6,
+        "power": 0.8,
+        "type": "multi_hit",
+        "hits": 2,
+        "element": "physical",
+        "description": "Attacks a single enemy twice."
+    }
+}

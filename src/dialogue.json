@@ -1,0 +1,120 @@
+{
+    "elder_mira": {
+        "default": {
+            "text": [
+                "Ah... you have come. The mist... it parts for you, does it not?",
+                "Or perhaps... it is merely waiting to swallow you whole.",
+                "The Veil has not lifted, child. It has... thickened. The Sun is but a memory.",
+                "Take this. It is a 'Seed of Warding'.",
+                "Do not flinch. It is warm, yes? Like fresh blood.",
+                "Go to Emberfall Keep. Find King Valen. He... he understands the hunger.",
+                "Find Drekkar. He knows the truth of the Prison Stone.",
+                "Go now. Before the shadows realize you are awake."
+            ],
+            "flag_set": "met_mira"
+        },
+        "met_mira": {
+            "text": [
+                "Why do you linger?",
+                "The Seed... it grows hungry. Feed it with your journey.",
+                "Do not trust your eyes. They lie. Only the Seed sees true."
+            ]
+        }
+    },
+    "king_valen": {
+        "default": {
+            "text": [
+                "Hee hee! More guests? Or more... ingredients?",
+                "Oh, it's you. The one Mira spoke of in the whispers.",
+                "You must stop him! Drekkar! He wants to start the Revelry!",
+                "Stay away from the bog. The mud... it screams."
+            ]
+        }
+    },
+    "villager": {
+        "default": {
+            "text": [
+                "Don't look at me!",
+                "They say the scarecrows move when you blink.",
+                "I saw my brother yesterday. He's been dead for ten years.",
+                "He told me to join the feast...",
+                "Stay away from the bog. The mud... it screams."
+            ]
+        }
+    },
+    "wanderer": {
+        "default": {
+            "text": [
+                "I wander, lost, searching for something I cannot name.",
+                "The forest whispers, but I cannot hear."
+            ]
+        }
+    },
+    "oracle": {
+        "default": {
+            "text": [
+                "The Veil hides many truths, but I see beyond it.",
+                "Beware the shadows that hunger for your fear."
+            ]
+        }
+    },
+    "survivor": {
+        "default": {
+            "text": [
+                "I escaped the horrors, but they still chase my mind.",
+                "Run, before they find you too."
+            ]
+        }
+    },
+    "ghost_hunter": {
+        "default": {
+            "text": [
+                "Anomalies are rising. I hunt them, but they hunt back.",
+                "Stay close, the darkness is listening."
+            ]
+        }
+    },
+    "hermit": {
+        "default": {
+            "text": [
+                "I fled the madness, now I hide in silence.",
+                "Do not disturb the quiet."
+            ]
+        }
+    },
+    "wizard": {
+        "default": {
+            "text": [
+                "Greetings, traveler. I sense a latent power within you.",
+                "The magical currents are disturbed lately.",
+                "If you seek knowledge, prove yourself by mastering the elements."
+            ]
+        },
+        "quest_2_completed": {
+            "text": [
+                "Excellent work finding me. You have potential.",
+                "I have taught you the Fireball spell. Use it wisely."
+            ]
+        }
+    },
+    "merchant": {
+        "default": {
+            "text": [
+                "Potions! Ethers! Bombs! I have it all!",
+                "But alas, my stock is running low on Potions.",
+                "Could you find me some? I'll pay handsomely."
+            ]
+        },
+        "quest_3_completed": {
+            "text": [
+                "Ah! You found them! Thank you, kind traveler.",
+                "Here is your reward. Come back anytime!"
+            ]
+        }
+    },
+    "default": {
+        "default": {
+            "text": "..."
+        }
+    }
+}

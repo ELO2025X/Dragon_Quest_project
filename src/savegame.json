@@ -1,0 +1,28 @@
+{
+    "hero": {
+        "level": 1,
+        "xp": 0,
+        "xp_to_next": 10,
+        "gold": 999,
+        "strength": 5,
+        "defense": 3,
+        "agility": 4,
+        "luck": 3,
+        "hp": 60,
+        "max_hp": 60,
+        "mp": 25,
+        "max_mp": 25,
+        "spells": [
+            "Heal"
+        ]
+    },
+    "world": {
+        "map_id": "world_map",
+        "x": 3.125,
+        "y": 52.0
+    },
+    "flags": {
+        "has_pendant": true,
+        "start_quest": true
+    }
+}

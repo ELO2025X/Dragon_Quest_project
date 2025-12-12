@@ -1,0 +1,24 @@
+[
+    {
+        "quest_id": 1,
+        "name": "Slime Slayer",
+        "description": "Defeat 5 slimes to prove your worth!",
+        "quest_type": "kill",
+        "target": "slime",
+        "goal": 5,
+        "reward_xp": 50,
+        "reward_gold": 25,
+        "reward_spell": "Heal"
+    },
+    {
+        "quest_id": 2,
+        "name": "Meet the Wizard",
+        "description": "Find and talk to the Wizard in the northern town.",
+        "quest_type": "talk",
+        "target": "wizard",
+        "goal": 1,
+        "reward_xp": 30,
+        "reward_gold": 15,
+        "reward_spell": "Fireball"
+    }
+]

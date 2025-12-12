@@ -1,0 +1,117 @@
+{
+  "warrior": {
+    "name": "Warrior",
+    "description": "A master of arms, focused on physical combat and defense.",
+    "base_stats": {
+      "strength": 10,
+      "agility": 4,
+      "intelligence": 2,
+      "vitality": 8
+    },
+    "skills": [
+      {
+        "name": "Power Attack",
+        "jp_cost": 100,
+        "description": "Increases attack power by 10%."
+      },
+      {
+        "name": "Guard",
+        "jp_cost": 200,
+        "description": "Reduces damage taken by 5%."
+      }
+    ],
+    "next_tier": "gladiator"
+  },
+  "mage": {
+    "name": "Mage",
+    "description": "A wielder of powerful offensive spells.",
+    "base_stats": {
+      "strength": 2,
+      "agility": 5,
+      "intelligence": 10,
+      "vitality": 4
+    },
+    "skills": [
+      {
+        "name": "Frizz Mastery",
+        "jp_cost": 100,
+        "description": "Increases damage of Frizz-type spells by 10%."
+      },
+      {
+        "name": "Magic Boost",
+        "jp_cost": 200,
+        "description": "Increases overall magic power by 5%."
+      }
+    ],
+    "next_tier": "sage"
+  },
+  "priest": {
+    "name": "Priest",
+    "description": "A holy healer who supports the party with defensive and restorative magic.",
+    "base_stats": {
+      "strength": 3,
+      "agility": 4,
+      "intelligence": 8,
+      "vitality": 6
+    },
+    "skills": [
+      {
+        "name": "Heal Boost",
+        "jp_cost": 100,
+        "description": "Increases healing spell effectiveness by 10%."
+      },
+      {
+        "name": "Blessing",
+        "jp_cost": 200,
+        "description": "Slightly increases all party members' defense."
+      }
+    ],
+    "next_tier": "sage"
+  },
+  "martial_artist": {
+    "name": "Martial Artist",
+    "description": "A swift and agile fighter who uses their body as a weapon.",
+    "base_stats": {
+      "strength": 7,
+      "agility": 10,
+      "intelligence": 3,
+      "vitality": 5
+    },
+    "skills": [
+      {
+        "name": "Critical Hit Up",
+        "jp_cost": 150,
+        "description": "Increases critical hit chance by 5%."
+      },
+      {
+        "name": "Evasion Up",
+        "jp_cost": 250,
+        "description": "Increases chance to evade attacks."
+      }
+    ],
+    "next_tier": "gladiator"
+  },
+  "gladiator": {
+    "name": "Gladiator",
+    "description": "A fierce warrior who sacrifices defense for overwhelming offense.",
+    "base_stats": {
+      "strength": 12,
+      "agility": 6,
+      "intelligence": 1,
+      "vitality": 7
+    },
+    "skills": [
+      {
+        "name": "Double Slash",
+        "jp_cost": 150,
+        "description": "Attacks an enemy twice."
+      },
+      {
+        "name": "Focus",
+        "jp_cost": 200,
+        "description": "Next attack deals double damage."
+      }
+    ],
+    "next_tier": "champion"
+  }
+}

@@ -1,0 +1,43 @@
+{
+    "elder_mira": {
+        "name": "Elder Mira",
+        "image": "ElderMira.png",
+        "dialogue_id": "elder_mira",
+        "quest_id": 1
+    },
+    "villager": {
+        "name": "Villager",
+        "image": "Villager.png",
+        "dialogue_id": "villager"
+    },
+    "king_valen": {
+        "name": "King Valen",
+        "image": "KingValen.png",
+        "dialogue_id": "king_valen"
+    },
+    "wanderer": {
+        "name": "Wanderer",
+        "dialogue_id": "wanderer",
+        "image": "Wanderer.png"
+    },
+    "oracle": {
+        "name": "Oracle",
+        "dialogue_id": "oracle",
+        "image": "Oracle.png"
+    },
+    "survivor": {
+        "name": "Survivor",
+        "dialogue_id": "survivor",
+        "image": "Survivor.png"
+    },
+    "ghost_hunter": {
+        "name": "Ghost Hunter",
+        "dialogue_id": "ghost_hunter",
+        "image": "Ghost_Hunter.png"
+    },
+    "hermit": {
+        "name": "Hermit",
+        "dialogue_id": "hermit",
+        "image": "Hermit.png"
+    }
+}
