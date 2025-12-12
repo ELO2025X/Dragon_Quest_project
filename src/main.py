@@ -343,6 +343,13 @@ class Game:
         pygame.draw.rect(self.screen, DEBUG_COLOR, self.camera.apply(self.player), 1)
 
 if __name__ == "__main__":
-    import asyncio
-    game_instance = Game() # Assign to global
-    asyncio.run(game_instance.run())
+    print("MAIN: Starting Execution")
+    try:
+        import asyncio
+        game_instance = Game() # Assign to global
+        print("MAIN: Game Instance Created")
+        asyncio.run(game_instance.run())
+    except Exception as e:
+        print(f"FATAL ERROR in main: {e}")
+        import traceback
+        traceback.print_exc()
