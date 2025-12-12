@@ -50,10 +50,16 @@ sys.excepthook = handle_exception
 class Game:
     def __init__(self):
         pygame.init()
-        self.screen = pygame.display.set_mode((WIDTH, HEIGHT), pygame.FULLSCREEN | pygame.SCALED)
+        # Web Compatibility: FULLSCREEN can be tricky with pygbag's canvas handling.
+        # Using SCALED only or just windowed is safer for initial debug.
+        # also removing SCALED for now to reduce variables, though SCALED is usually fine.
+        flags = pygame.SCALED if sys.platform != 'emscripten' else 0 
+        # Actually, let's try simple windowed first.
+        self.screen = pygame.display.set_mode((WIDTH, HEIGHT)) 
         pygame.display.set_caption(TITLE)
         self.clock = pygame.time.Clock()
         self.logger = Logger()
+        print("Game Initialized - Window Created")
         
         # Core Components
         self.resource_manager = ResourceManager(self)
@@ -251,6 +257,16 @@ class Game:
             self.events()
             self.update()
             self.draw()
+            
+            # Simple heartbeat for web debugging
+            if hasattr(self, 'frame_count'):
+                self.frame_count += 1
+            else:
+                self.frame_count = 0
+            
+            if self.frame_count % 120 == 0:
+                print(f"Heartbeat: Frame {self.frame_count}, State: {self.game_state_manager.current_state}")
+
             await asyncio.sleep(0)
 
     def quit(self):
